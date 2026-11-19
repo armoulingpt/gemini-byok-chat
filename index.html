@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gemini BYOK Chat</title>
+<meta name="description" content="Bring your own key Gemini chat: text, image generation and image editing, all in the browser.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo" aria-hidden="true">&#10022;</span>
+    <div>
+      <h1>Gemini BYOK Chat</h1>
+      <p class="tagline">Your key, your Gemini, in your browser.</p>
+    </div>
+  </div>
+  <div class="top-actions">
+    <span id="keyStatus" class="key-status">No key saved</span>
+    <button id="themeToggle" class="btn ghost" type="button" aria-label="Toggle light and dark mode">&#9788; Theme</button>
+  </div>
+</header>
+
+<main class="layout">
+  <aside class="panel settings" aria-label="Settings">
+    <section class="card">
+      <h2>Your Gemini API key</h2>
+      <p class="muted">Get a free key at <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com</a>. It is stored only in this browser&rsquo;s localStorage, never sent anywhere except Google&rsquo;s API.</p>
+      <label class="field-label" for="apiKey">API key</label>
+      <div class="key-row">
+        <input id="apiKey" type="password" placeholder="Paste your Gemini API key" autocomplete="off" spellcheck="false">
+        <button id="toggleKeyVisibility" class="btn ghost" type="button" aria-label="Show or hide API key">Show</button>
+      </div>
+      <div class="row">
+        <button id="saveKey" class="btn primary" type="button">Save key</button>
+        <button id="forgetKey" class="btn danger-ghost" type="button">Forget key</button>
+      </div>
+      <p id="keyMessage" class="msg" role="status"></p>
+      <p class="warning"><strong>Heads up:</strong> a BYOK key in a browser is visible to anyone using this browser. Don&rsquo;t use this on a shared computer, and use &ldquo;Forget key&rdquo; when you&rsquo;re done.</p>
+    </section>
+
+    <section class="card">
+      <h2>Model</h2>
+      <label class="field-label" for="modelSelect">Chat model (loaded live from Gemini)</label>
+      <select id="modelSelect" disabled>
+        <option>Save a key first</option>
+      </select>
+      <button id="refreshModels" class="btn ghost" type="button" disabled>Refresh models</button>
+      <p id="modelMessage" class="msg" role="status"></p>
+      <p class="muted small">Image generation &amp; editing always use <code>gemini-2.5-flash-image</code> (Nano Banana), whatever chat model you pick.</p>
+    </section>
+
+    <section class="card">
+      <h2>Agent</h2>
+      <label class="field-label" for="presetSelect">Preset</label>
+      <select id="presetSelect">
+        <option value="assistant">Assistant &mdash; helpful general chat</option>
+        <option value="coder">Coder &mdash; concise, code-first</option>
+        <option value="image-editor">Image editor &mdash; short image prompts &amp; edits</option>
+        <option value="custom">Custom</option>
+      </select>
+      <label class="field-label" for="systemPrompt">System prompt</label>
+      <textarea id="systemPrompt" rows="4" spellcheck="false"></textarea>
+      <label class="field-label" for="temperature">Temperature: <span id="temperatureValue">0.7</span></label>
+      <input id="temperature" type="range" min="0" max="2" step="0.1" value="0.7">
+      <p class="muted small">Agent settings are saved in this browser and apply to text chat.</p>
+    </section>
+
+    <section class="card">
+      <h2>Conversation</h2>
+      <div class="row">
+        <button id="clearChat" class="btn ghost" type="button">Clear chat</button>
+        <button id="exportChat" class="btn ghost" type="button">Export .md</button>
+      </div>
+      <p class="muted small">History stays in this browser. Images are kept in the conversation until you clear it.</p>
+    </section>
+  </aside>
+
+  <section class="chat-wrap" aria-label="Chat">
+    <div class="mode-bar" role="tablist" aria-label="Mode">
+      <button id="modeChat" class="mode-btn active" type="button" role="tab" aria-selected="true">Chat</button>
+      <button id="modeImage" class="mode-btn" type="button" role="tab" aria-selected="false">Generate image</button>
+      <button id="modeEdit" class="mode-btn" type="button" role="tab" aria-selected="false">Edit image</button>
+    </div>
+    <p id="modeHint" class="mode-hint">Ask anything. Replies stream back as markdown.</p>
+
+    <div id="messages" class="messages" aria-live="polite"></div>
+
+    <div id="attachPreview" class="attach-preview hidden">
+      <img id="attachImg" alt="Attached image preview">
+      <div>
+        <p id="attachName" class="muted small"></p>
+        <button id="removeAttach" class="btn ghost small-btn" type="button">Remove image</button>
+      </div>
+    </div>
+
+    <form id="composer" class="composer">
+      <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+      <button id="attachBtn" class="btn ghost icon-btn" type="button" title="Attach an image" aria-label="Attach an image">&#128444;</button>
+      <label class="sr-only" for="promptInput">Message</label>
+      <textarea id="promptInput" rows="2" placeholder="Message Gemini&hellip;" required></textarea>
+      <button id="sendBtn" class="btn primary" type="submit">Send</button>
+      <button id="stopBtn" class="btn danger-ghost hidden" type="button">Stop</button>
+    </form>
+    <p class="muted small footer-note">Calls go directly from your browser to Google&rsquo;s Generative Language API (and, only if you choose the fallback, to Pollinations). No server, no analytics, no telemetry.</p>
+  </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
